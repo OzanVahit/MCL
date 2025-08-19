@@ -25,13 +25,13 @@ donme=0;
 menzil = 0.35; % LiDAR'ın ölçüm menzili (birimi: metre)
 N = 1000; % Parçacık sayısı
 
-px(1:N) = 0; % Parçacıkların x ekseni üzerindeki konumlarınının yer aldığı dizi
-py(1:N) = 0; % Parçacıkların y ekseni üzerindeki konumlarınının yer aldığı dizi
-pteta(1:N) = 0; % Parçacıkların açılarının yer aldığı dizi
+px = zeros(1,N); % Parçacıkların x ekseni üzerindeki konumlarınının yer aldığı dizi
+py = zeros(1,N); % Parçacıkların y ekseni üzerindeki konumlarınının yer aldığı dizi
+pteta = zeros(1,N); % Parçacıkların açılarının yer aldığı dizi
 
-p1x(1:N) = 0;
-p1y(1:N) = 0;
-p1teta(1:N) = 0;
+p1x = zeros(1,N);
+p1y = zeros(1,N);
+p1teta = zeros(1,N);
 index = 1;
 
 % Robot hareketinde kullanılan hata parametreleri
@@ -612,3 +612,4 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
