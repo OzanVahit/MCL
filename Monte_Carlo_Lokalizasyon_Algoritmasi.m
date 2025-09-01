@@ -61,7 +61,7 @@ hata = 0;
 W(1:N) = (1/N); % Başlangıç anında robotun gerçek konumu bilinmediğinden, tüm parçacıkların robotun konumunda bulunma olasılıkları eşit ve 1/N olarak kabul edilir
 W_aci(1:N) = (1/N);
 
-cx = 0.0;  % Robotun başlangıç anında x ekseni üzerindeki gerçek konumu (metre)
+cx = 0.4;  % Robotun başlangıç anında x ekseni üzerindeki gerçek konumu (metre)
 cy = 0.78; % Robotun başlangıç anında y ekseni üzerindeki gerçek konumu (metre)
 cteta = 0; % Robotun başlangıç anındaki gerçek açı değeri (radyan)
 
@@ -213,23 +213,37 @@ for k1 = 1:adim_sayisi
      else
     [m2 n2] =size(Landmarkp);
      end
-    if(m1~=m2)
+
+    
+    
+    if(k1<15)  
+        if(m1~=m2)
         W(i) = 0;
         W_aci(i)=0;
+        else
+       [Wi] = olcum_agirlik(Landmarkp, Z, px(i), py(i), olcum_Noise); % parçacıkların önem ağırlıkları hesaplanıyor
+       W(i) = Wi;
+      [W1i] = yonelim_agirlik(Bearing, Bearingp, bearing_Noise);
+      W_aci(i) = W1i;
+        end
     else
-    
-    [Wi] = olcum_agirlik(Landmarkp, Z, px(i), py(i), olcum_Noise); % parçacıkların önem ağırlıkları hesaplanıyor
-    W(i) = Wi;
-    [W1i] = yonelim_agirlik(Bearing, Bearingp, bearing_Noise);
-    W_aci(i) = W1i;
+        if(m1~=m2)
+        W(i) = 0;
+        W_aci(i)=0;
+        else
+        [Wt] = birlesik_agirlik(Landmarkp, Z, px(i), py(i), olcum_Noise, Bearing, Bearingp, bearing_Noise);
+        W(i) = Wt;
+        end
     end
     
     end
   
-    
+    if(k1<15) 
     [px py W] = low_variance_resampler(px,py,W,N); % low variance yeniden örnekleme algoritması ile parçacıkların önem ağırlıklarına göre yeniden örneklemesi yapılıyor
     [pteta] = aci_resampler(W_aci,pteta,N);
- 
+    else
+    [px py pteta W] = low_variance_resampler2(px,py,pteta,W,N);
+    end
      
     end
    
@@ -243,7 +257,7 @@ for k1 = 1:adim_sayisi
        end
    end
 
-   %parcacikteta = sum(pteta)/N;
+   
     parcacikteta = W*(pteta');
    Pr(k1,:) = [parcacikx parcaciky parcacikteta];
    hata(k1) = sqrt((cx-parcacikx)^2 + (cy-parcaciky)^2); % hata hesaplanıyor
@@ -556,6 +570,59 @@ function [W1] = yonelim_agirlik(Bearing, Bearingp,bearing_Noise)
 end
 
 
+function [Wt] = birlesik_agirlik(Landmarkp, Z, pcx, pcy, olcum_Noise, Bearing, Bearingp,bearing_Noise)
+
+    n = length(Bearing);
+    prob =1;
+    Q = [olcum_Noise^2 0; 0 bearing_Noise^2];
+   
+    for i =1:n
+    aci = (Bearing(i)-Bearingp(i))*(180/pi); 
+    
+    if(aci>=360)
+        aci = (aci-360);
+        
+    end
+    if(aci<=-360)
+        aci = (aci+360);
+        
+    end
+    
+     if(aci>=360)
+        aci = (aci-360);
+        
+    end
+    if(aci<=-360)
+        aci = (aci+360);
+        
+    end
+    
+     
+    if(aci>=180)
+        aci = (aci-360);
+        
+    end
+    
+    if(aci<=-180)
+         aci = (aci+360);
+        
+    end
+
+    dist_aci = aci*(pi/180);
+    dist_landmark = sqrt((pcx-Landmarkp(i,1)).^2 + (pcy-Landmarkp(i,2)).^2);
+    dist_olcum = Z(i)-dist_landmark;
+    zv = [dist_olcum;dist_aci];
+     g = ((det(2*pi*Q))^(-0.5))*exp(-0.5*(zv')*(inv(Q))*(zv));
+     prob = prob*g;
+    end
+     Wt = prob;
+     
+    if(Wt<=0)
+        Wt=0;
+    end
+end
+
+
 function [px py Weight] = low_variance_resampler(px,py,Weight,Np)
 
 toplam = sum(Weight);
@@ -589,6 +656,41 @@ Weight = Weight/sum(Weight);
 
 end
 
+function [px py pteta Weight] = low_variance_resampler2(px,py,pteta,Weight,Np)
+
+toplam = sum(Weight);
+Weight = Weight/toplam;
+wk(1:Np) = 1/Np;
+wa = Weight(1);
+r = (rand)/Np;
+iw = 1;
+
+for mw = 1:Np 
+  
+    
+    U = r + (mw-1)/(Np);
+ 
+     
+     while U > wa                
+             iw = iw + 1;
+             wa = wa + Weight(iw);
+     end
+
+     psx(mw) = px(iw);
+     psy(mw) = py(iw);
+     psteta(mw) = pteta(iw);
+     wk(mw) = Weight(iw);
+    
+end
+
+px = psx;
+py = psy;
+pteta = psteta;
+Weight = wk;
+Weight = Weight/sum(Weight);
+
+end
+
 
 function [pteta] = aci_resampler(W_aci,pteta,N)
 
@@ -612,4 +714,6 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
+
 
