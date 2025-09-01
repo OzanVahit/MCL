@@ -231,7 +231,7 @@ for k1 = 1:adim_sayisi
         W(i) = 0;
         W_aci(i)=0;
         else
-        [Wt] = birlesik_agirlik(Landmarkp, Z, px(i), py(i), olcum_Noise, Bearing, Bearingp, bearing_Noise);
+        [Wt] = birlesik_agirlik(Landmarkp, Z, px(i), py(i), olcum_Noise, Bearing, Bearingp, bearing_Noise); % parçacıkların önem ağırlıkları hesaplanıyor
         W(i) = Wt;
         end
     end
@@ -242,7 +242,7 @@ for k1 = 1:adim_sayisi
     [px py W] = low_variance_resampler(px,py,W,N); % low variance yeniden örnekleme algoritması ile parçacıkların önem ağırlıklarına göre yeniden örneklemesi yapılıyor
     [pteta] = aci_resampler(W_aci,pteta,N);
     else
-    [px py pteta W] = low_variance_resampler2(px,py,pteta,W,N);
+    [px py pteta W] = low_variance_resampler2(px,py,pteta,W,N); % low variance yeniden örnekleme algoritması ile parçacıkların önem ağırlıklarına göre yeniden örneklemesi yapılıyor
     end
      
     end
@@ -714,6 +714,7 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
 
 
