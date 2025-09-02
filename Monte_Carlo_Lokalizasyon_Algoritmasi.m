@@ -18,7 +18,7 @@
 clc
 clear all
 
-bearing_Noise = 0.1; % Bearing açı gürültüsünün standart sapması (birimi: radyan)
+bearing_Noise = 0.07; % Bearing açı gürültüsünün standart sapması (birimi: radyan)
 olcum_Noise= 0.03; % Landmarktan alınan mesafe ölçüm gürültüsünün standart sapması (birimi: metre)
 donme=0;
 
@@ -714,6 +714,7 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
 
 
