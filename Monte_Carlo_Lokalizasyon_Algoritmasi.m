@@ -2,7 +2,7 @@
 
 % produced by Ozan Vahit Altınpınar (ozan.altinpinar@cumhuriyet.edu.tr, altinpinaro@itu.edu.tr) (2025)
 % Matlab script Monte_Carlo_Lokalizasyon_Algoritmasi.m
-% Description: This script contains the implementation of the Monte Carlo Localization (MCL) algorithm, capable of estimating the initial unknown position of a mobile robot in an environment containing landmarks.
+% Description: This script contains the implementation of the Monte Carlo Localization (MCL) algorithm, capable of estimating the unknown initial position of a mobile robot in an environment containing landmarks.
 % *********************************************************************************************************************************************
 % ***** The codes of the MCL algorithm were developed based on the information provided in Probabilistic Robotics authored by Thrun et al.*****
 % *********************************************************************************************************************************************
@@ -714,6 +714,7 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
 
 
