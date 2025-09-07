@@ -56,6 +56,7 @@ d_parcacik = 0.03; % parçacık yön çubuğunun uzunluğu
 Bearing = 0 ;
 Landmark = 0;
 hata = 0;
+m = 0;
 
 [px py pteta] = baslangic(harita_x,harita_y,N); % Başlangıç anında parçacıklar, haritanın tamamına rastgele uniform dağılımla dağıtılıyor
 W(1:N) = (1/N); % Başlangıç anında robotun gerçek konumu bilinmediğinden, tüm parçacıkların robotun konumunda bulunma olasılıkları eşit ve 1/N olarak kabul edilir
@@ -138,7 +139,7 @@ for k1 = 1:adim_sayisi
 
    axis([0 harita_x 0 harita_y])
    
-   title(['\color{magenta}Adım Sayısı = ',num2str(k1-1)]);
+   title(['\color{magenta}Adım Sayısı = ',num2str(k1-1)],['\color{magenta}Tespit Edilen Landmark Sayısı = ',num2str(m)]);
    xlabel('X [m]');
    ylabel('Y [m]');
    
@@ -714,6 +715,7 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
 
 
