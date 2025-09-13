@@ -11,7 +11,7 @@
 
 % ***ÖNEMLİ UYARI!!!****
 % Başlangıçta, parçacıklar haritanın tamamına rastgele atanmaktadır ve
-% parçacık sayısınıa göre parçacıkların robotun gerçek konumunun etrafına
+% parçacık sayısına göre parçacıkların robotun gerçek konumunun etrafına
 % düşme olasılıkları değişmektedir. Eğer başlangıç anında düzgün bir atama
 % olmazsa simülasyonu durdurup tekrar başlatınız!
 
@@ -718,6 +718,7 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
 
 
