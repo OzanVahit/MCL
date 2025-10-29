@@ -1,5 +1,3 @@
-
-
 % produced by Ozan Vahit Altınpınar (ozan.altinpinar@cumhuriyet.edu.tr, altinpinaro@itu.edu.tr) (2025)
 % Matlab script Monte_Carlo_Lokalizasyon_Algoritmasi.m
 % Description: This script contains the implementation of the Monte Carlo Localization (MCL) algorithm, capable of estimating the unknown initial position of a mobile robot in an environment containing landmarks.
@@ -11,16 +9,17 @@
 
 % ***ÖNEMLİ UYARI!!!****
 % Başlangıçta, parçacıklar haritanın tamamına rastgele atanmaktadır ve
-% parçacık sayısına göre parçacıkların robotun gerçek konumunun etrafına
+% parçacık sayısınıa göre parçacıkların robotun gerçek konumunun etrafına
 % düşme olasılıkları değişmektedir. Eğer başlangıç anında düzgün bir atama
 % olmazsa simülasyonu durdurup tekrar başlatınız!
 
-% Yüksek işlemci frekanslı/çok çekirdekli bilgisayara sahipseniz N=1500 
-% parçacıkla çalışmanız tavsiye edilir.
+% Algoritmanın gerçek çalışma hızını tespit edebilmek için tüm Figure'ler
+% kapatılmıştır. Figure'ler, başlarındaki parantez kaldırılarak açılabilir.
 
 clc
 clear all
 
+%format long
 bearing_Noise = 0.07; % Bearing açı gürültüsünün standart sapması (birimi: radyan)
 olcum_Noise= 0.03; % Landmarktan alınan mesafe ölçüm gürültüsünün standart sapması (birimi: metre)
 
@@ -48,7 +47,7 @@ alfa6=0.001;
 harita_x = 2; % haritanın x eksenindeki toplam uzunluğu (birimi: metre)
 harita_y = 1.5; % haritanın y eksenindeki toplam uzunluğu (birimi: metre)
 
-Landmarks = [[0.2,1];[0.35,0.6];[0.5,1.1];[0.6,0.7];[0.7,1.1];[0.85,1.1];[1,0.5];[0.75,0.55];[1.1,1];[1.8,0.88];[1.8,0.5];[1.4,1]]; % landmarkların bilinen konumları
+Landmarks = [[0.2,1];[0.35,0.6];[0.5,1.1];[0.6,0.7];[0.7,1.1];[0.75,0.55];[0.85,1.1];[1,0.5];[1.1,1];[1.4,1];[1.8,0.5];[1.8,0.88]]; % landmarkların bilinen konumları
 Landmarkp=0;
 
 C=[1,0,0;0,1,0;0,0,1;1,0,1];
@@ -83,16 +82,19 @@ wl = [ 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 b b b b b  10 10 10 10
 adim_sayisi = length(wr);
 Xr=zeros(adim_sayisi,3);
 Pr=zeros(adim_sayisi,3);
-
-
+durum = 0;
+sayi = 1;
 for k1 = 1:adim_sayisi
-    
+    tic
     Wxk = W;
     
     x1 = d_robot*cos(cteta) + cx;
     y1 = d_robot*sin(cteta) + cy;
     Xr(k1,:) = [cx cy cteta];
-    
+
+    % figure 1'i açmak için aşağıdaki parantezi kaldırınız.
+
+    %{
     figure(1)
     clf
     plot(Xr(1:k1,1),Xr(1:k1,2),'g--','Linewidth',2);
@@ -145,7 +147,7 @@ for k1 = 1:adim_sayisi
    title(['\color{magenta}Adım Sayısı = ',num2str(k1-1)],['\color{magenta}Tespit Edilen Landmark Sayısı = ',num2str(m)]);
    xlabel('X [m]');
    ylabel('Y [m]');
-   
+    %}
     Nx = length(px);
     
     Ns = 50;
@@ -174,7 +176,10 @@ for k1 = 1:adim_sayisi
             Wxy(iy,ix) = Wxk(ij);
         
     end
-    
+
+    % figure 2'yi açmak için aşağıdaki parantezi kaldırınız.
+
+    %{
     figure(2)
     clf
    
@@ -187,13 +192,35 @@ for k1 = 1:adim_sayisi
      hold on
     axis([0 harita_x 0 harita_y])
     pause(0.001)
-   
+    %}
    
     
    [X Y O v w] = robot_hareket(wr(k1), wl(k1), R, cx, cy, cteta, dt, d, harita_x, harita_y); % robot hareket ediyor
     cx = X;
     cy = Y;
     cteta = O;
+
+
+    %{
+    if k1 == 32
+        cx = cx+0.08*randn;
+        cy = cy+0.08*randn;
+        cteta = cteta + 0.01*pi*randn;
+    end
+
+    if k1 == 50
+        cx = cx+0.08*randn;
+        cy = cy+0.08*randn;
+        cteta = cteta + 0.01*pi*randn;
+    end
+
+    if k1 == 64
+        cx = cx+0.08*randn;
+        cy = cy+0.08*randn;
+        cteta = cteta + 0.01*pi*randn;
+    end
+    %}
+
     
 
     [X Y O] = parcacik_hareket(v,w,px,py,pteta,alfa1,alfa2,alfa3,alfa4,alfa5,alfa6,dt,N,harita_x,harita_y); % parçacıklar hareket ediyor
@@ -250,19 +277,43 @@ for k1 = 1:adim_sayisi
     end
      
     end
+
+   
    
    % MCL algoritmasının konum tahmini yapılıyor:
    parcacikx = W*(px'); % Parçacıkların x ekseni üzerindeki ağırlıklı ortalaması
    parcaciky = W*(py'); % Parçacıkların y ekseni üzerindeki ağırlıklı ortalaması
+   sonuc = 1;
 
    for ik =1:N
        if(pteta(ik)>pi)
           pteta(ik) = pteta(ik)-2*pi;
        end
+
+       hata_p = sqrt((cx-px(ik))^2 + (cy-py(ik))^2);
+
+       %Merkezi robotun bulunduğu konum, yarıçapı ise 0.2 metre olan çemberin içine parçacıkların tamamının yakınsayıp yakınsamadığını belirleyen yöntem:
+
+       if hata_p>=0.2
+           
+           anahtar = 0;
+       else
+           anahtar = 1;
+       end
+
+       sonuc = sonuc*anahtar;
    end
 
+   if(durum == 0)
    
-    parcacikteta = W*(pteta');
+       if sonuc == 0
+          sayi = sayi+1;
+       else
+          durum = 1;
+       end
+   end
+   
+    parcacikteta = W*(pteta'); % Yönelim açısı tahmini
    Pr(k1,:) = [parcacikx parcaciky parcacikteta];
    hata(k1) = sqrt((cx-parcacikx)^2 + (cy-parcaciky)^2); % hata hesaplanıyor
    
@@ -302,11 +353,34 @@ for k1 = 1:adim_sayisi
 
    aci_hata(k1) = abs(aci);
     
+    zaman(k1) = toc;
 end
 
-Ort_2B_hata = mean(hata)
-Std_dev = sqrt(var(hata))
+N = length(hata);
 
+RMS_2B_hata = sqrt(sum(hata.*hata)/N) % birimi:[metre]
+
+RMS_yonelim_hata = sqrt(sum(aci_hata.*aci_hata)/N) % birimi:[derece]
+
+Ort_2B_hata = mean(hata) % birimi:[metre]
+
+Std_dev = sqrt(var(hata)) % birimi:[metre]
+
+Ort_Mutlak_Aci_hata = mean(aci_hata) % birimi:[derece]
+
+ort_zaman = mean(zaman)*1000 % birimi:[milisaniye]
+
+Yakinsama_adimi = sayi
+
+%Sonucları .csv uzantılı dosyaya kaydetme:
+T1 = table({'2B_Pozisyon_hata_dizisi: '; 'Yonelim_Mutlak_Hata_Dizisi: '}, [hata;aci_hata],'VariableNames', {'Deney Sonucu','  Deger'});
+T2 = table({'Konum_RMS_Hata: ';'Yonelim_RMS_Hata: ';'Konum_Mean_Hata: ';'Yonelim_Mean_Hata: ';'Algoritmanin_ortalma_calisma_zamani [ms/adim]: ';'Parcaciklarin_tamaminin_yakinsadigi_adim_sayisi: '},[RMS_2B_hata;RMS_yonelim_hata;Ort_2B_hata;Ort_Mutlak_Aci_hata;ort_zaman;Yakinsama_adimi],'VariableNames', {'Deney Sonucu','   Deger'});
+writetable(T1,'deney_sonuclari.csv');
+writetable(T2, 'deney_sonuclari.csv', 'WriteMode', 'append');
+
+% figure 4'ü açmak için aşağıdaki parantezi kaldırınız.
+
+%{
 
 for i=1:adim_sayisi
     
@@ -346,9 +420,11 @@ for i=1:adim_sayisi
     ylabel('Y[m]');
     title(['\color{red}Kırmızı: Konum Tahmini',', \color{green}Yeşil: Gerçek Konum'])
     axis([0 harita_x 0 harita_y])
-    pause(0.1)
+    pause(0.01)
     
 end
+
+%}
 
 %<===========FONKSİYONLAR===============>
 
@@ -718,14 +794,4 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
-
-
-
-
-
-
-
-
-
-
 
