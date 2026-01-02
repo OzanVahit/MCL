@@ -64,7 +64,7 @@ m = 0;
 W(1:N) = (1/N); % Başlangıç anında robotun gerçek konumu bilinmediğinden, tüm parçacıkların robotun konumunda bulunma olasılıkları eşit ve 1/N olarak kabul edilir
 W_aci(1:N) = (1/N);
 
-cx = 0.00;  % Robotun başlangıç anında x ekseni üzerindeki gerçek konumu (metre)
+cx = 0.40;  % Robotun başlangıç anında x ekseni üzerindeki gerçek konumu (metre)
 cy = 0.78; % Robotun başlangıç anında y ekseni üzerindeki gerçek konumu (metre)
 cteta = 0; % Robotun başlangıç anındaki gerçek açı değeri (radyan)
 
@@ -794,4 +794,5 @@ p_teta(1:N) = 0;
 pteta = p_teta;
 
 end
+
 
